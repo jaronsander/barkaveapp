@@ -5,16 +5,15 @@ const Home = () => {
   return (
     <section className='w-full flex-center flex-col'>
       <h1 className='head_text text-center'>
-        More than authentication.
+        Bark Avenue
         <br className='max-md:hidden' />
-        <span className='blue_gradient text-center'>
+        <span className='green_gradient text-center'>
           {' '}
-          Complete User Management
+          Dog Adventures
         </span>
       </h1>
       <p className='desc text-center'>
-        Clerk is more than a “sign-in box”. Integrate complete user management
-        UIs and APIs, purpose-built for React, Next.js, and the Modern Web.
+        
       </p>
 
       <Feed />

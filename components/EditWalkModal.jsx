@@ -4,7 +4,14 @@ import WalkForm from './WalkForm'; // Assuming WalkForm is already created and c
 import { getToken, updateWalk } from '../utils/requests';
 import { useAuth } from '@clerk/nextjs';
 
-const EditWalkModal = ({ isOpen, onClose, walk, onWalkUpdated, users, walkers, submitting}) => {
+const EditWalkModal = ({ isOpen,
+    onClose,
+    walk,
+    onWalkUpdated,
+    dogs,
+    locations,
+    walkers,
+    submitting}) => {
   if (!isOpen) return null;
   const { userId, getToken } = useAuth();
   const handleFormSubmit = async (formData) => {
@@ -16,10 +23,18 @@ const EditWalkModal = ({ isOpen, onClose, walk, onWalkUpdated, users, walkers, s
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white rounded-lg p-5">
+      <div className="bg-white rounded-lg p-5 relative"> {/* Add relative positioning here */}
+        <button onClick={onClose} className="absolute top-0 right-0 mt-4 mr-4 bg-gray-500 text-white py-2 px-4 rounded">Close</button> {/* Move button to top-right corner */}
+
         <h2 className="text-xl font-semibold mb-4">Edit Walk</h2>
-        <WalkForm initialWalk={walk} onSubmit={handleFormSubmit} users={users} walkers={walkers} submitting={submitting}/>
-        <button onClick={onClose} className="mt-4 bg-gray-500 text-white py-2 px-4 rounded">Close</button>
+        <WalkForm 
+            initialWalk={walk}
+            onSubmit={handleFormSubmit}
+            walkers={walkers}
+            submitting={submitting}
+            dogs={dogs}
+            locations={locations}
+        />
       </div>
     </div>
   );

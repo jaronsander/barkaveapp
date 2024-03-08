@@ -4,7 +4,9 @@ import { SignIn } from "@clerk/nextjs";
 const signIn = () => {
   return (
     <div>
-      <SignIn />
+      <SignIn 
+      redirectUrl="/"
+      />
     </div>
   )
 }

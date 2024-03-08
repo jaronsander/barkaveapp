@@ -3,7 +3,8 @@ import { SignUp } from "@clerk/nextjs";
 const signUp = () => {
   return (
     <div>
-      <SignUp />
+      <SignUp 
+      redirectUrl="/"/>
     </div>
   )
 }
