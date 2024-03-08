@@ -32,7 +32,6 @@ const EditWalkModal = ({ isOpen,
             walkers={walkers}
             submitting={submitting}
             dogs={dogs}
-            locations={locations}
         />
       </div>
     </div>
