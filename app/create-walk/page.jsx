@@ -12,21 +12,18 @@ const CreateWalk = () => {
   const [submitting, setSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [dogs, setDogs] = useState([]);
-  const [locations, setLocations] = useState([]);
   const [walkers, setWalkers] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       // Assume these functions are similar to getUsers but fetch dogs, locations, and walkers
       const token = await getToken({ template: 'supabase' });
-      const [dogsData, locationsData, walkersData] = await Promise.all([
+      const [dogsData, walkersData] = await Promise.all([
         getDogsByUser({ token }),
-        getLocationsByUser({ token }),
         getWalkers({ token }),
       ]);
-      console.log(dogsData, locationsData, walkersData);
+      console.log(dogsData, walkersData);
       setDogs(dogsData);
-      setLocations(locationsData);
       setWalkers(walkersData);
     };
     fetchData();
@@ -57,7 +54,6 @@ const CreateWalk = () => {
       <WalkForm
         onSubmit={handleFormSubmit}
         dogs={dogs}
-        locations={locations}
         walkers={walkers}
         submitting={submitting}
       />

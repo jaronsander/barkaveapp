@@ -5,13 +5,13 @@ const createURL = (path) => {
 }
 
 export const getUsers = async () => {
-    const response = await fetch(createURL('/api/getusers'), {cache: 'no-store'});
+    const response = await fetch(createURL('/api/getusers'), { next: { revalidate: 0 }});
     const users = await response.json();
     return users;
 }
 
 export const getWalkers = async () => {
-    const response = await fetch(createURL('/api/getwalkers'),{cache: 'no-store'});
+    const response = await fetch(createURL('/api/getwalkers'),{ next: { revalidate: 0 }});
     const walkers = await response.json();
     return walkers;
 }

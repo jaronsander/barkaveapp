@@ -9,7 +9,6 @@ const EditWalkModal = ({ isOpen,
     walk,
     onWalkUpdated,
     dogs,
-    locations,
     walkers,
     submitting}) => {
   if (!isOpen) return null;

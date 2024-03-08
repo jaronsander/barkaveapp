@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@clerk/nextjs';
-import { getUsers, getWalkers, getWalks, getDogsByUser, getLocationsByUser, updateWalk } from '../utils/requests';
+import { getUsers, getWalkers, getWalks, getDogsByUser, updateWalk } from '../utils/requests';
 import  WalkItem from './WalkItem';
 import  EditWalkModal from './EditWalkModal';
 
@@ -17,7 +17,6 @@ const Feed = () => {
   const [users, setUsers] = useState([]);
   const [walkers, setWalkers] = useState([]);
   const [dogs, setDogs] = useState([]);
-  const [locations, setLocations] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -73,7 +72,7 @@ const Feed = () => {
         const token = await getToken({ template: 'supabase' });
         
         try {
-          // Fetch walks, walkers, dogs, and locations in parallel for efficiency
+          // Fetch walks, walkers, and dogs in parallel for efficiency
           const walksData = await getWalks({ token });
           console.log(walksData.walks);
           setWalks(walksData.walks);
@@ -88,9 +87,7 @@ const Feed = () => {
 
           const dogsData = await getDogsByUser({ userId, token });
           setDogs(dogsData);
-
-          const locationsData = await getLocationsByUser({ userId, token });
-          setLocations(locationsData);
+          
           let startDate = null, endDate = null;
           if (dateFilter === 'tomorrow') {
               const tomorrow = new Date();
@@ -184,7 +181,6 @@ const Feed = () => {
         walk={currentWalkToEdit}
         onWalkUpdated={handleWalkUpdated}
         dogs={dogs}
-        locations={locations}
         walkers={walkers}
         submitting={submitting}
       />

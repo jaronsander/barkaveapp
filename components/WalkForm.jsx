@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const WalkForm = ({ initialWalk = {}, onSubmit, dogs, locations, walkers, submitting}) => {
+const WalkForm = ({ initialWalk = {}, onSubmit, dogs, walkers, submitting}) => {
   // If initialWalk has values, it's for editing; otherwise, it's for creating a new walk.
   const [formData, setFormData] = useState(() => ({
     user_id: initialWalk.user_id || '',
@@ -23,7 +23,6 @@ const WalkForm = ({ initialWalk = {}, onSubmit, dogs, locations, walkers, submit
       notes: initialWalk.notes || '',
       status: initialWalk.status || 'Scheduled',
       dog_id: initialWalk.dog_id || '', // Added for dog picker
-      location_id: initialWalk.location_id || '', // Added for location picker  
     });
     console.log(initialWalk);
   }, [initialWalk.user_id, initialWalk.walker_id, initialWalk.walk_date, initialWalk.pickup_time, initialWalk.walk_type, initialWalk.notes, initialWalk.status]); // List all properties of initialWalk used in the effect
@@ -61,25 +60,6 @@ const WalkForm = ({ initialWalk = {}, onSubmit, dogs, locations, walkers, submit
             <option value="">Select Dog</option>
             {dogs.map((dog) => (
               <option key={dog.id} value={dog.id}>{dog.name}</option>
-            ))}
-          </select>
-        </div>
-        {/* Location Picker */}
-        <div className="w-full md:w-1/3 px-3 mb-6">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="location_id">
-            Location
-          </label>
-          <select
-            id="location_id"
-            name="location_id"
-            onChange={handleInputChange}
-            value={formData.location_id}
-            required
-            className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          >
-            <option value="">Select Location</option>
-            {locations.map((location) => (
-              <option key={location.id} value={location.id}>{location.address}</option>
             ))}
           </select>
         </div>
