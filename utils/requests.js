@@ -58,7 +58,7 @@ export const postWalk = async ({ userId, walk, token }) => {
     return null;
   }
   console.log('Walk posted successfully');
-  return error;
+  return true;
 };
 
 

@@ -36,6 +36,7 @@ const CreateWalk = () => {
       const token = await getToken({ template: 'supabase' });
       // Adjust formData as needed before sending to your API
       const response = await postWalk({userId: userId, walk: formData, token: token });
+      console.log(response);
       if (response) {
         setSuccessMessage('Walk successfully created!');
       }
@@ -50,12 +51,13 @@ const CreateWalk = () => {
   return (
     <div className="max-w-4xl mx-auto mt-10">
       <h2 className="text-2xl font-semibold my-4">Create Walk</h2>
-      {successMessage && <p className="text-green-500 text-xs italic">{successMessage}</p>}
+      <p className="text-green-500">{successMessage}</p>
       <WalkForm
         onSubmit={handleFormSubmit}
         dogs={dogs}
         walkers={walkers}
         submitting={submitting}
+        successMessage={successMessage}
       />
     </div>
   );

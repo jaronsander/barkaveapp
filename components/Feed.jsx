@@ -3,18 +3,17 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { getUsers, getWalkers, getWalks, getDogsByUser, updateWalk } from '../utils/requests';
 import  WalkItem from './WalkItem';
+import GroupWalkItem from './GroupWalkItem';
 import  EditWalkModal from './EditWalkModal';
 
 const Feed = () => {
   const [walks, setWalks] = useState([]);
   const { userId, getToken } = useAuth();
-  const [userMap, setUserMap] = useState({});
   const [walkerMap, setWalkerMap] = useState({});
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentWalkToEdit, setCurrentWalkToEdit] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
-  const [users, setUsers] = useState([]);
   const [walkers, setWalkers] = useState([]);
   const [dogs, setDogs] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
@@ -23,13 +22,61 @@ const Feed = () => {
   const [limit, setLimit] = useState(10); // You can adjust the limit as needed
   const [dateFilter, setDateFilter] = useState('');
 
-  const sortWalks = (key) => {
-    let direction = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
+  const preprocessWalks = (walks) => {
+    const groups = {}; // For grouping group walks
+    const result = []; // To hold both group and non-group walks
+  
+    walks.forEach(walk => {
+      // Handle group walks
+      if (walk.walk_type === 'Group') {
+        const key = `${walk.walk_date}-${walk.group_tag}-${walk.walker_id}`;
+        if (!groups[key]) {
+          groups[key] = [];
+        }
+        groups[key].push(walk);
+      } else {
+        // Handle non-group walks by adding them directly to the result
+        result.push({
+          type: walk.walk_type,
+          walk: walk,
+        });
+      }
+    });
+  
+    // Process group walks and add them to the result
+    Object.values(groups).forEach(groupWalks => {
+      result.push({
+        type: 'Group',
+        details: groupWalks[0], // Details from the first walk for displaying group info
+        walks: groupWalks, // All walks in the group
+      });
+    });
+  
+    return result;
+  };  
+
+  useEffect(() => {
+    const sortArray = (array) => {
+      const sortedArray = [...array].sort((a, b) => {
+        if (!sortConfig.key) return 0; // If no sort key, don't sort
+        
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === 'ascending' ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === 'ascending' ? 1 : -1;
+        }
+        return 0;
+      });
+      return sortedArray;
+    };
+  
+    // Only sort walks if sortConfig.key is not null
+    if (sortConfig.key) {
+      const sortedWalks = sortArray(walks);
+      setWalks(sortedWalks);
     }
-    setSortConfig({ key, direction });
-  };
+  }, [sortConfig]); 
   
   const handleEditClick = (walk) => {
     setCurrentWalkToEdit(walk);
@@ -40,8 +87,9 @@ const Feed = () => {
     const token = await getToken({ template: 'supabase' });
     try {
       const walksData = await getWalks({ token });
-      console.log(walksData);
-      setWalks(walksData);
+      const preprocessedWalks = preprocessWalks(walksData.walks);
+      console.log(preprocessedWalks);
+      setWalks(preprocessedWalks);
     } catch (error) {
       console.error('Error fetching walks:', error.message);
       setWalks([]);
@@ -74,13 +122,14 @@ const Feed = () => {
         try {
           // Fetch walks, walkers, and dogs in parallel for efficiency
           const walksData = await getWalks({ token });
-          console.log(walksData.walks);
-          setWalks(walksData.walks);
+          const preprocessedWalks = preprocessWalks(walksData.walks);
+          console.log(preprocessedWalks);
+          setWalks(preprocessedWalks);
 
           const walkersData = await getWalkers({ token });
           console.log(walkersData);
           setWalkerMap(walkersData.reduce((acc, walker) => {
-            acc[walker.id] = walker.emailAddresses[0].emailAddress;
+            acc[walker.id] = walker.firstName;
             return acc;
           }, {}));
           setWalkers(walkersData);
@@ -103,7 +152,9 @@ const Feed = () => {
           }
 
           const { walks, total } = await getWalks({ token, page, limit, startDate, endDate });
-          setWalks(walks);
+          const preprocessed = preprocessWalks(walks);
+          console.log(preprocessed);
+          setWalks(preprocessed);
           setTotal(total);
         } catch (error) {
           console.error('Error fetching data:', error.message);
@@ -136,28 +187,28 @@ const Feed = () => {
         </select>
       </div>
       <table className="min-w-full table-auto">
-        <thead>
-          <tr>
-            <th className="px-4 py-2 border cursor-pointer" onClick={() => sortWalks('dog_name')}>Dog</th>
-            <th className="px-4 py-2 border cursor-pointer" onClick={() => sortWalks('walker_name')}>Walker</th>
-            <th className="px-4 py-2 border cursor-pointer" onClick={() => sortWalks('walk_date')}>Date</th>
-            <th className="px-4 py-2 border cursor-pointer" onClick={() => sortWalks('pickup_time')}>Pickup Time</th>
-            <th className="px-4 py-2 border"> </th>
-          </tr>
-        </thead>
-        <tbody>
-          {walks.map((walk) => (
-            <WalkItem
-              key={walk.id}
-              dog={walk.dog.name}
-              walker={walkerMap[walk.walker_id]}
-              date={walk.walk_date}
-              pickupTime={walk.pickup_time}
-              handleEdit={() => handleEditClick(walk)}
-            />
-          ))}
-        </tbody>
-      </table>
+      <thead>
+        <tr>
+          <th className="px-4 py-2 border">Dog</th>
+          <th className="px-4 py-2 border">Walker</th>
+          <th className="px-4 py-2 border">Date</th>
+          <th className="px-4 py-2 border">Pickup Time</th>
+          <th className="px-4 py-2 border"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {Object.keys(walkerMap).length > 0 && walks.map((item, index) => {
+          if (item.type === 'Group') {
+            // Render GroupWalkItem for grouped walks
+            return <GroupWalkItem key={`group-${index}`} groupDetails={item.details} walks={item.walks} walkerMap={walkerMap} handleEdit={handleEditClick}/>;
+          } else {
+            // Render WalkItem for individual walks
+            console.log(item.walk);
+            return <WalkItem key={item.walk.id} walk={item.walk} walker={walkerMap[item.walk.walker_id]} handleEdit={() => handleEditClick(item.walk)} />
+          }
+        })}
+      </tbody>
+    </table>
       <div className="pagination-controls flex items-center space-x-2 my-4">
         <button
           onClick={() => setPage(page - 1)}

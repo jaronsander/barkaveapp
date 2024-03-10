@@ -1,6 +1,6 @@
 import React from 'react';
 
-const WalkItem = ({ dog, walker, date, pickupTime, handleEdit }) => {
+const WalkItem = ({ walk, walker, handleEdit }) => {
 
   // Function to format time to HH:MM format
   const formatTime = (date) => {
@@ -21,17 +21,17 @@ const WalkItem = ({ dog, walker, date, pickupTime, handleEdit }) => {
   };
 
   // Create a Date object for the start time. The specific date doesn't matter since we're only manipulating time.
-  const startTime = new Date(`2024-01-01T${pickupTime}`);
+  const startTime = new Date(`2024-01-01T${walk.pickup_time}`);
   // Add one hour to the start time to calculate the end time
   const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 60 minutes * 60 seconds * 1000 milliseconds
   // Format the start and end times to the desired "HH:MM" format
   const timeRange = `${formatTime(startTime)} - ${formatTime(endTime)}`;
 
-  const dte = formatDate(date);
+  const dte = formatDate(walk.walk_date);
 
   return (
     <tr>
-      <td className="border px-4 py-2">{dog}</td>
+      <td className="border px-4 py-2">{walk.dog.name}</td>
       <td className="border px-4 py-2">{walker}</td>
       <td className="border px-4 py-2">{dte}</td>
       <td className="border px-4 py-2">{timeRange}</td>
