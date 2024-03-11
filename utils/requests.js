@@ -88,6 +88,16 @@ export const updateWalk = async ({ walkId, walk, token }) => {
   return error;
 }
 
+export const deleteWalk = async ({ walkId, token }) => {
+  const supabase = await supabaseClient(token);
+  const { error } = await supabase
+    .from('dog_walks')
+    .delete()
+    .eq('id', walkId);
+  
+  return error;
+}
+
 
 export const addDog = async ({ userId, name, breed, token }) => {
   const supabase = await supabaseClient(token);

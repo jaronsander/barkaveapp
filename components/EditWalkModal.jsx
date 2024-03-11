@@ -1,7 +1,7 @@
 // EditWalkModal.js
 import React from 'react';
 import WalkForm from './WalkForm'; // Assuming WalkForm is already created and can accept an initialWalkData prop
-import { getToken, updateWalk } from '../utils/requests';
+import { getToken, updateWalk, deleteWalk } from '../utils/requests';
 import { useAuth } from '@clerk/nextjs';
 
 const EditWalkModal = ({ isOpen,
@@ -33,6 +33,12 @@ const EditWalkModal = ({ isOpen,
             submitting={submitting}
             dogs={dogs}
         />
+        <button onClick={async () => {
+          const token = await getToken({ template: 'supabase' });
+          await deleteWalk({ walkId: walk.id, token });
+          onWalkUpdated();
+        }
+        } className="mt-4 bg-red-500 text-white py-2 px-4 rounded">Delete Walk</button>
       </div>
     </div>
   );
